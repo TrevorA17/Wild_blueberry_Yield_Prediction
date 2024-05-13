@@ -27,3 +27,12 @@ head(wild_blueberry_data)
 
 # View the dataset in a separate viewer window
 View(wild_blueberry_data)
+
+# Check for missing values
+missing_values <- sum(is.na(wild_blueberry_data))
+
+# Display summary of missing values
+print(paste("Number of missing values:", missing_values))
+
+# Summary of missing values by column
+print(summary(is.na(wild_blueberry_data)))
