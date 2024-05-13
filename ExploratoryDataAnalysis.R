@@ -81,3 +81,17 @@ distribution <- data.frame(
 # Display results
 print("Measures of Distribution:")
 print(distribution)
+
+# Measures of relationship
+
+# Calculate correlation coefficients for numeric variables
+correlation_matrix <- cor(wild_blueberry_data[, sapply(wild_blueberry_data, is.numeric)], use = "pairwise.complete.obs")
+
+# Create contingency tables for categorical variables
+contingency_tables <- lapply(wild_blueberry_data[, sapply(wild_blueberry_data, is.factor)], table)
+
+# Display results
+print("Correlation Matrix for Numeric Variables:")
+print(correlation_matrix)
+print("Contingency Tables for Categorical Variables:")
+print(contingency_tables)
