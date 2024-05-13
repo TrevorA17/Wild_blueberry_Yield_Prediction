@@ -95,3 +95,29 @@ print("Correlation Matrix for Numeric Variables:")
 print(correlation_matrix)
 print("Contingency Tables for Categorical Variables:")
 print(contingency_tables)
+
+# Load the ggplot2 library
+library(ggplot2)
+
+# Univariate plots (histograms for numeric variables, bar plots for categorical variables)
+univariate_plots <- lapply(names(wild_blueberry_data), function(var_name) {
+  if (is.numeric(wild_blueberry_data[[var_name]])) {
+    ggplot(wild_blueberry_data, aes_string(x = var_name)) +
+      geom_histogram(fill = "skyblue", color = "black") +
+      labs(title = paste("Histogram of", var_name), x = var_name, y = "Frequency")
+  } else {
+    ggplot(wild_blueberry_data, aes_string(x = var_name)) +
+      geom_bar(fill = "skyblue", color = "black") +
+      labs(title = paste("Bar Plot of", var_name), x = var_name, y = "Frequency")
+  }
+})
+
+
+# Display plots
+print("Univariate Plots:")
+print(univariate_plots)
+
+
+
+
+
