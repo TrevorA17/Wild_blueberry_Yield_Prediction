@@ -68,3 +68,16 @@ central_tendency <- cbind(central_tendency, Mode = mode_values)
 # Display results
 print("Measures of Central Tendency:")
 print(central_tendency)
+
+# Measures of distribution
+
+# Calculate range, variance, and standard deviation for numeric variables
+distribution <- data.frame(
+  Range = sapply(wild_blueberry_data[, sapply(wild_blueberry_data, is.numeric)], function(x) max(x, na.rm = TRUE) - min(x, na.rm = TRUE)),
+  Variance = sapply(wild_blueberry_data[, sapply(wild_blueberry_data, is.numeric)], var, na.rm = TRUE),
+  StdDev = sapply(wild_blueberry_data[, sapply(wild_blueberry_data, is.numeric)], sd, na.rm = TRUE)
+)
+
+# Display results
+print("Measures of Distribution:")
+print(distribution)
