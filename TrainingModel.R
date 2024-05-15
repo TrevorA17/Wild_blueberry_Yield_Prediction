@@ -48,3 +48,26 @@ print(dim(train_data))
 print("Dimensions of Testing Data:")
 print(dim(test_data))
 
+# Define the number of bootstrap iterations
+num_iterations <- 1000
+
+# Create an empty vector to store the bootstrapped means
+bootstrapped_means <- numeric(num_iterations)
+
+# Perform bootstrapping
+for (i in 1:num_iterations) {
+  # Sample with replacement from the original dataset
+  boot_sample <- sample(wild_blueberry_data$yield, replace = TRUE)
+  # Calculate the mean of the bootstrapped sample and store it
+  bootstrapped_means[i] <- mean(boot_sample)
+}
+
+# Calculate the mean and standard error of bootstrapped means
+mean_boot_mean <- mean(bootstrapped_means)
+se_boot_mean <- sd(bootstrapped_means)
+
+# Display results
+print("Bootstrapping Results:")
+print(paste("Mean of Bootstrapped Means:", mean_boot_mean))
+print(paste("Standard Error of Bootstrapped Means:", se_boot_mean))
+
