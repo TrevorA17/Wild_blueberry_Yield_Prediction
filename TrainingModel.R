@@ -71,3 +71,19 @@ print("Bootstrapping Results:")
 print(paste("Mean of Bootstrapped Means:", mean_boot_mean))
 print(paste("Standard Error of Bootstrapped Means:", se_boot_mean))
 
+# Load the caret library for cross-validation
+library(caret)
+
+# Define the number of folds for cross-validation
+num_folds <- 10
+
+# Define the control parameters for cross-validation
+ctrl <- trainControl(method = "cv", number = num_folds)
+
+# Define the model training process
+model <- train(yield ~ ., data = wild_blueberry_data, method = "lm", trControl = ctrl)
+
+# Print the cross-validated performance metrics
+print("Cross-Validated Performance Metrics:")
+print(model$results)
+
