@@ -87,3 +87,21 @@ model <- train(yield ~ ., data = wild_blueberry_data, method = "lm", trControl =
 print("Cross-Validated Performance Metrics:")
 print(model$results)
 
+# Load the caret library for model training
+library(caret)
+
+# Train linear regression model
+lm_model <- train(yield ~ ., data = wild_blueberry_data, method = "lm")
+
+# Train generalized linear model
+glm_model <- train(yield ~ ., data = wild_blueberry_data, method = "glm")
+
+# Train gradient boosting machine model
+gbm_model <- train(yield ~ ., data = wild_blueberry_data, method = "gbm")
+
+# Print the trained models
+print("Trained Models:")
+print(lm_model)
+print(glm_model)
+print(gbm_model)
+
