@@ -105,3 +105,10 @@ print(lm_model)
 print(glm_model)
 print(gbm_model)
 
+# Combine trained models into a list
+trained_models <- list(lm = lm_model, glm = glm_model,  gbm = gbm_model)
+# Compare model performance using resamples
+model_performance <- resamples(trained_models)
+
+# Summarize the results
+summary(model_performance)
