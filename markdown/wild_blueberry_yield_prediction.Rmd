@@ -1,0 +1,342 @@
+---
+title: "Wild Blueberry Yield Prediction"
+author: "Trevor Okinda"
+date: "2024"
+output:
+  github_document: 
+    toc: yes
+    toc_depth: 4
+    fig_width: 6
+    fig_height: 4
+    df_print: default
+editor_options:
+  chunk_output_type: console
+---
+
+# Student Details
+
+|                                              |     |
+|----------------------------------------------|-----|
+| **Student ID Number**                        | 134780 |
+| **Student Name**                             | Trevor Okinda |
+| **BBIT 4.2 Group**                           | C |
+| **Project Name**                             | Wild Blueberry Yield Prediction |
+
+# Setup Chunk
+
+**Note:** the following KnitR options have been set as the global defaults: <BR> `knitr::opts_chunk$set(echo = TRUE, warning = FALSE, eval = TRUE, collapse = FALSE, tidy = TRUE)`.
+
+More KnitR options are documented here <https://bookdown.org/yihui/rmarkdown-cookbook/chunk-options.html> and here <https://yihui.org/knitr/options/>.
+
+```{r setup, include=FALSE}
+library(formatR)
+knitr::opts_chunk$set(
+  warning = FALSE,
+  collapse = FALSE
+)
+```
+
+### Source: 
+
+The dataset that was used can be downloaded here: *\<https://www.kaggle.com/datasets/shashwatwork/wild-blueberry-yield-prediction-dataset\>*
+
+### Reference:
+
+*\<Tiwari, S. (2020). Wild Blueberry Yield Prediction Dataset. Retrieved from Kaggle
+Qu, H., Obsie, E., & Drummond, F. (2020). Data for: Wild blueberry yield prediction using a combination of computer simulation and machine learning algorithms. Mendeley Data, V1. https://www.kaggle.com/datasets/shashwatwork/wild-blueberry-yield-prediction-dataset\>\
+Refer to the APA 7th edition manual for rules on how to cite datasets: <https://apastyle.apa.org/style-grammar-guidelines/references/examples/data-set-references>*
+
+# Exploratory Data Analysis
+## Load dataset
+```{r load dataset}
+# Load dataset
+wild_blueberry_data <- read.csv("WildBlueberryPollinationSimulationData.csv", colClasses = c(
+  clonesize = "numeric",
+  honeybee = "numeric",
+  bumbles = "numeric",
+  andrena = "numeric",
+  osmia = "numeric",
+  MaxOfUpperTRange = "numeric",
+  MinOfUpperTRange = "numeric",
+  AverageOfUpperTRange = "numeric",
+  MaxOfLowerTRange = "numeric",
+  MinOfLowerTRange = "numeric",
+  AverageOfLowerTRange = "numeric",
+  RainingDays = "numeric",
+  AverageRainingDays = "numeric",
+  fruitset = "numeric",
+  fruitmass = "numeric",
+  seeds = "numeric",
+  yield = "numeric"
+))
+
+# Display the structure of the dataset
+str(wild_blueberry_data)
+
+# View the first few rows of the dataset
+head(wild_blueberry_data)
+
+# View the dataset in a separate viewer window
+View(wild_blueberry_data)
+```
+
+## Measures of Frequency
+```{r MOF}
+# Measures of frequency
+
+# Count of unique values in each column
+unique_counts <- sapply(wild_blueberry_data, function(x) length(unique(x)))
+
+# Summary of unique value counts
+summary_unique <- summary(unique_counts)
+
+# Frequency table for categorical variables
+frequency_table <- lapply(wild_blueberry_data[, sapply(wild_blueberry_data, is.factor)], table)
+
+# Display results
+print("Summary of Unique Value Counts:")
+print(summary_unique)
+print("Frequency Tables for Categorical Variables:")
+print(frequency_table)
+```
+
+## Measures of Central Tendency
+```{r MOCT}
+# Measures of central tendency
+
+# Calculate mean, median, and mode for numeric variables
+central_tendency <- data.frame(
+  Mean = sapply(wild_blueberry_data[, sapply(wild_blueberry_data, is.numeric)], mean, na.rm = TRUE),
+  Median = sapply(wild_blueberry_data[, sapply(wild_blueberry_data, is.numeric)], median, na.rm = TRUE)
+)
+
+# Mode function
+get_mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+# Calculate mode
+mode_values <- sapply(wild_blueberry_data[, sapply(wild_blueberry_data, is.numeric)], get_mode)
+
+# Combine mean, median, and mode into one dataframe
+central_tendency <- cbind(central_tendency, Mode = mode_values)
+
+# Display results
+print("Measures of Central Tendency:")
+print(central_tendency)
+```
+
+## Measures of Distribution
+```{r MOD}
+# Measures of distribution
+
+# Calculate range, variance, and standard deviation for numeric variables
+distribution <- data.frame(
+  Range = sapply(wild_blueberry_data[, sapply(wild_blueberry_data, is.numeric)], function(x) max(x, na.rm = TRUE) - min(x, na.rm = TRUE)),
+  Variance = sapply(wild_blueberry_data[, sapply(wild_blueberry_data, is.numeric)], var, na.rm = TRUE),
+  StdDev = sapply(wild_blueberry_data[, sapply(wild_blueberry_data, is.numeric)], sd, na.rm = TRUE)
+)
+
+# Display results
+print("Measures of Distribution:")
+print(distribution)
+```
+
+## Measures of Relationship
+```{r MOR}
+# Measures of relationship
+
+# Calculate correlation coefficients for numeric variables
+correlation_matrix <- cor(wild_blueberry_data[, sapply(wild_blueberry_data, is.numeric)], use = "pairwise.complete.obs")
+
+# Create contingency tables for categorical variables
+contingency_tables <- lapply(wild_blueberry_data[, sapply(wild_blueberry_data, is.factor)], table)
+
+# Display results
+print("Correlation Matrix for Numeric Variables:")
+print(correlation_matrix)
+print("Contingency Tables for Categorical Variables:")
+print(contingency_tables)
+```
+
+## Plots
+```{r Plots}
+# Load the ggplot2 library
+library(ggplot2)
+
+# Univariate plots (histograms for numeric variables, bar plots for categorical variables)
+univariate_plots <- lapply(names(wild_blueberry_data), function(var_name) {
+  if (is.numeric(wild_blueberry_data[[var_name]])) {
+    ggplot(wild_blueberry_data, aes_string(x = var_name)) +
+      geom_histogram(fill = "skyblue", color = "black") +
+      labs(title = paste("Histogram of", var_name), x = var_name, y = "Frequency")
+  } else {
+    ggplot(wild_blueberry_data, aes_string(x = var_name)) +
+      geom_bar(fill = "skyblue", color = "black") +
+      labs(title = paste("Bar Plot of", var_name), x = var_name, y = "Frequency")
+  }
+})
+
+
+# Display plots
+print("Univariate Plots:")
+print(univariate_plots)
+```
+
+# Preprocessing and Data Transformation
+## Missing Values
+```{r Missing Values}
+# Check for missing values
+missing_values <- sum(is.na(wild_blueberry_data))
+
+# Display summary of missing values
+print(paste("Number of missing values:", missing_values))
+
+# Summary of missing values by column
+print(summary(is.na(wild_blueberry_data)))
+
+```
+
+# Training Model
+## Data Splitting
+```{r Data Splitting}
+# Load the caret library for data splitting
+library(caret)
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Define the proportion of data to be used for training (e.g., 70% for training, 30% for testing)
+train_proportion <- 0.7
+
+# Split the dataset into training and testing sets
+index <- createDataPartition(y = wild_blueberry_data$yield, p = train_proportion, list = FALSE)
+train_data <- wild_blueberry_data[index, ]
+test_data <- wild_blueberry_data[-index, ]
+
+# Print the dimensions of the training and testing sets
+print("Dimensions of Training Data:")
+print(dim(train_data))
+print("Dimensions of Testing Data:")
+print(dim(test_data))
+```
+
+## Bootstrapping
+```{r Bootstrapping}
+# Load required package
+library(boot)
+
+# Define the number of bootstrap iterations
+num_iterations <- 1000
+
+# Create an empty vector to store the bootstrapped means
+bootstrapped_means <- numeric(num_iterations)
+
+# Perform bootstrapping
+for (i in 1:num_iterations) {
+  # Sample with replacement from the original dataset
+  boot_sample <- sample(wild_blueberry_data$yield, replace = TRUE)
+  # Calculate the mean of the bootstrapped sample and store it
+  bootstrapped_means[i] <- mean(boot_sample)
+}
+
+# Calculate the mean and standard error of bootstrapped means
+mean_boot_mean <- mean(bootstrapped_means)
+se_boot_mean <- sd(bootstrapped_means)
+
+# Display results
+print("Bootstrapping Results:")
+print(paste("Mean of Bootstrapped Means:", mean_boot_mean))
+print(paste("Standard Error of Bootstrapped Means:", se_boot_mean))
+
+```
+
+## Cross-validation
+```{r Cross-Validation}
+# Load the caret library for cross-validation
+library(caret)
+
+# Define the number of folds for cross-validation
+num_folds <- 10
+
+# Define the control parameters for cross-validation
+ctrl <- trainControl(method = "cv", number = num_folds)
+
+# Define the model training process
+model <- train(yield ~ ., data = wild_blueberry_data, method = "lm", trControl = ctrl)
+
+# Print the cross-validated performance metrics
+print("Cross-Validated Performance Metrics:")
+print(model$results)
+```
+
+## Model Training
+```{r Model Training}
+# Load the caret library for model training
+library(caret)
+
+# Train linear regression model
+lm_model <- train(yield ~ ., data = wild_blueberry_data, method = "lm")
+
+# Train generalized linear model
+glm_model <- train(yield ~ ., data = wild_blueberry_data, method = "glm")
+
+# Train gradient boosting machine model
+gbm_model <- train(yield ~ ., data = wild_blueberry_data, method = "gbm")
+
+# Print the trained models
+print("Trained Models:")
+print(lm_model)
+print(glm_model)
+print(gbm_model)
+```
+
+## Performance Comparison
+```{r Performance Comparison}
+# Combine trained models into a list
+trained_models <- list(lm = lm_model, glm = glm_model,  gbm = gbm_model)
+# Compare model performance using resamples
+model_performance <- resamples(trained_models)
+
+# Summarize the results
+summary(model_performance)
+```
+
+## Saving Model
+```{r Saving Model}
+# Saving the GBM model for the wild blueberry dataset
+saveRDS(gbm_model, file = "./models/wild_blueberry_gbm_model.rds")
+
+# Load the saved GBM model
+loaded_wild_blueberry_gbm_model <- readRDS("./models/wild_blueberry_gbm_model.rds")
+
+# Prepare new data for prediction (replace with your actual new data)
+new_wild_blueberry_data <- data.frame(
+  clonesize = c(37.5, 37.5, 38.2),  # Example clonesize values
+  honeybee = c(0.75, 0.85, 0.9),  # Example honeybee values
+  bumbles = c(0.25, 0.15, 0.2),  # Example bumbles values
+  andrena = c(0.25, 0.3, 0.4),  # Example andrena values
+  osmia = c(0.25, 0.2, 0.3),  # Example osmia values
+  MaxOfUpperTRange = c(86, 87, 85),  # Example MaxOfUpperTRange values
+  MinOfUpperTRange = c(52, 53, 50),  # Example MinOfUpperTRange values
+  AverageOfUpperTRange = c(71.9, 72.3, 71.5),  # Example AverageOfUpperTRange values
+  MaxOfLowerTRange = c(62, 63, 60),  # Example MaxOfLowerTRange values
+  MinOfLowerTRange = c(30, 32, 28),  # Example MinOfLowerTRange values
+  AverageOfLowerTRange = c(50.8, 51.2, 50.5),  # Example AverageOfLowerTRange values
+  RainingDays = c(16, 15, 18),  # Example RainingDays values
+  AverageRainingDays = c(0.1, 0.2, 0.3),  # Example AverageRainingDays values
+  fruitset = c(0.444, 0.435, 0.45),  # Example fruitset values
+  fruitmass = c(33.5, 32.7, 34.2),  # Example fruitmass values
+  seeds = c(5000, 4900, 5100)  # Example seeds values
+)
+
+# Use the loaded model to make predictions for new wild blueberry data
+predictions_gbm_loaded_model <- predict(loaded_wild_blueberry_gbm_model, newdata = new_wild_blueberry_data)
+
+# Print predictions
+print(predictions_gbm_loaded_model)
+
+```
+
+
